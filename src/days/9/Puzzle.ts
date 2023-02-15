@@ -53,7 +53,7 @@ export default class ConcretePuzzle extends Puzzle {
 
         if (this.isLowestPoint(p, n)) {
           // calculate basin
-          basins.push(this.calcualteBasin(p, i, j))
+          basins.push(this.calcualteBasin(i, j))
         }
       }
     }
@@ -64,7 +64,8 @@ export default class ConcretePuzzle extends Puzzle {
     return res.toString()
   }
 
-  private calcualteBasin(curP: number, x: number, y: number): number {
+  // flood fill
+  private calcualteBasin(x: number, y: number): number {
     let n: [number, number][] = []
     let basin: string[] = []
 
