@@ -37,11 +37,6 @@ export default class ConcretePuzzle extends Puzzle {
     return this.m[x][y]
   }
 
-  public getFirstExpectedResult(): string {
-    // RETURN EXPECTED SOLUTION FOR TEST 1;
-    return 'day 1 solution 1';
-  }
-
   public solveSecond(): string {
 
     this.m = this.createHeightmap()
@@ -120,6 +115,10 @@ export default class ConcretePuzzle extends Puzzle {
       x[1] < this.m[0].length)
   }
 
+  public getFirstExpectedResult(): string {
+    // RETURN EXPECTED SOLUTION FOR TEST 1;
+    return 'day 1 solution 1';
+  }
 
   public getSecondExpectedResult(): string {
     // RETURN EXPECTED SOLUTION FOR TEST 2;
