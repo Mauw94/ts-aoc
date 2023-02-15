@@ -2,35 +2,39 @@ import Puzzle from '../../types/AbstractPuzzle';
 
 export default class ConcretePuzzle extends Puzzle {
 
+  private m: number[][]
+
   public solveFirst(): string {
 
-    const m = this.createHeightmap()
+    this.m = this.createHeightmap()
     let lowPoints = []
 
-    for (let i = 0; i < m.length; i++) {
-      for (let j = 0; j < m[0].length; j++) {
-        const p = m[i][j]
-        const n = this.adjacent(i, j, m.length, m[0].length)
+    for (let i = 0; i < this.m.length; i++) {
+      for (let j = 0; j < this.m[0].length; j++) {
+        const p = this.getPoint(i, j)
+        const n = this.adjacent(i, j)
 
-        if (this.isLowestPoint(p, m, n)) {
+        if (this.isLowestPoint(p, n)) {
           lowPoints.push(p + 1)
         }
       }
     }
 
-    console.log(lowPoints.reduce((a, b) => a + b))
-
-    return 'day 1 solution 1';
+    return lowPoints.reduce((a, b) => a + b).toString()
   }
 
-  isLowestPoint(p: number, m: number[][], n: [number, number][]) {
+  isLowestPoint(p: number, n: [number, number][]) {
     for (let k = 0; k < n.length; k++) {
-      if (p >= m[n[k][0]][n[k][1]]) {
+      if (p >= this.getPoint(n[k][0], n[k][1])) {
         return false
       }
     }
 
     return true
+  }
+
+  getPoint(x: number, y: number) {
+    return this.m[x][y]
   }
 
   public getFirstExpectedResult(): string {
@@ -39,13 +43,52 @@ export default class ConcretePuzzle extends Puzzle {
   }
 
   public solveSecond(): string {
-    // WRITE SOLUTION FOR TEST 2
-    return 'day 1 solution 2';
+
+    this.m = this.createHeightmap()
+    let basins = []
+    for (let i = 0; i < this.m.length; i++) {
+      for (let j = 0; j < this.m[0].length; j++) {
+        const p = this.getPoint(i, j)
+        const n = this.adjacent(i, j)
+
+        if (this.isLowestPoint(p, n)) {
+          // calculate basin
+          basins.push(this.calcualteBasin(p, i, j))
+        }
+      }
+    }
+
+    basins.sort((a, b) => b - a)
+    const res = basins[0] * basins[1] * basins[2]
+
+    return res.toString()
   }
 
-  public getSecondExpectedResult(): string {
-    // RETURN EXPECTED SOLUTION FOR TEST 2;
-    return 'day 1 solution 2';
+  private calcualteBasin(curP: number, x: number, y: number): number {
+    let n: [number, number][] = []
+    let basin: string[] = []
+
+    n.push([x, y])
+    basin.push(`{x:${x},y:${y}}`)
+
+    while (n.length > 0) {
+      let next = n.pop()
+      let adj = this.adjacent(next[0], next[1])
+
+      const flow = adj.filter(a => this.getPoint(a[0], a[1]) > this.getPoint(next[0], next[1])
+        && this.getPoint(a[0], a[1]) < 9)
+
+      for (let i = 0; i < flow.length; i++) {
+        if (basin.includes(`{x:${flow[i][0]},y:${flow[i][1]}}`)) {
+          continue
+        }
+
+        n.push(flow[i])
+        basin.push(`{x:${flow[i][0]},y:${flow[i][1]}}`)
+      }
+    }
+
+    return basin.length
   }
 
   private createHeightmap(): number[][] {
@@ -59,11 +102,10 @@ export default class ConcretePuzzle extends Puzzle {
       }
     }
 
-    // console.log(m)
     return m
   }
 
-  private adjacent(x: number, y: number, width: number, height: number): [number, number][] {
+  private adjacent(x: number, y: number): [number, number][] {
     const neighbours: [number, number][] = []
     neighbours.push([x - 1, y])
     neighbours.push([x + 1, y])
@@ -72,8 +114,14 @@ export default class ConcretePuzzle extends Puzzle {
 
     return neighbours.filter(x =>
       x[0] >= 0 &&
-      x[0] < width &&
+      x[0] < this.m.length &&
       x[1] >= 0 &&
-      x[1] < height)
+      x[1] < this.m[0].length)
+  }
+
+
+  public getSecondExpectedResult(): string {
+    // RETURN EXPECTED SOLUTION FOR TEST 2;
+    return 'day 1 solution 2';
   }
 }
