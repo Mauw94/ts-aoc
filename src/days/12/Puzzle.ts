@@ -13,19 +13,12 @@ export default class ConcretePuzzle extends Puzzle {
     return paths.length.toString();
   }
 
-  public getFirstExpectedResult(): string {
-    // RETURN EXPECTED SOLUTION FOR TEST 1;
-    return 'day 1 solution 1';
-  }
-
   public solveSecond(): string {
-    // WRITE SOLUTION FOR TEST 2
-    return 'day 1 solution 2';
-  }
+    this.graph = this.createCaveSystem()
+    const paths: string[] = []
+    this.depthFirstSearch2("start", [], false, paths)
 
-  public getSecondExpectedResult(): string {
-    // RETURN EXPECTED SOLUTION FOR TEST 2;
-    return 'day 1 solution 2';
+    return paths.length.toString();
   }
 
   depthFirstSearch(node: string, visited: string[], paths: string[]) {
@@ -40,6 +33,31 @@ export default class ConcretePuzzle extends Puzzle {
         continue
       }
       this.depthFirstSearch(neighbour, [...visited], paths)
+    }
+  }
+
+  depthFirstSearch2(node: string, visited: string[], visitedTwice: boolean, paths: string[]) {
+    visited.push(node)
+    if (node === "end") {
+      console.log(visited.join(`,`))
+      paths.push(visited.join(`,`))
+      return
+    }
+    for (const neighbours of this.graph.get(node)) {
+      if (neighbours === "start") {
+        continue
+      }
+      if (this.isSmallCave(neighbours) && visited.includes(neighbours)) {
+        if (visitedTwice) {
+          continue
+        }
+        if (visited.filter((x) => x === neighbours).length >= 2) {
+          continue
+        }
+        this.depthFirstSearch2(neighbours, [...visited], true, paths)
+      } else {
+        this.depthFirstSearch2(neighbours, [...visited], visitedTwice, paths)
+      }
     }
   }
 
@@ -66,6 +84,19 @@ export default class ConcretePuzzle extends Puzzle {
 
     return graph
   }
+
+
+
+  public getSecondExpectedResult(): string {
+    // RETURN EXPECTED SOLUTION FOR TEST 2;
+    return 'day 1 solution 2';
+  }
+
+  public getFirstExpectedResult(): string {
+    // RETURN EXPECTED SOLUTION FOR TEST 1;
+    return 'day 1 solution 1';
+  }
+
 }
 
 
